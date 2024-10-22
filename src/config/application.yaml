@@ -1,0 +1,14 @@
+# application.yaml
+development:
+  service:
+    url: 'http://127.0.0.1:18177'
+  lighthouse:
+    mode: 'mode'
+
+production:
+  service:
+    url: 'http://127.0.0.1:18177'
+
+test:
+  service:
+    url: 'http://127.0.0.1:18177'

@@ -1,57 +1,112 @@
-import * as React from 'react'
+import React, {useEffect} from 'react'
+import axios from 'axios'
 import {DataGrid} from '@mui/x-data-grid'
 import {Box} from '@mui/material'
 import LoadingButton from '@mui/lab/LoadingButton'
+import {applicationConfigState} from '../../config/atoms/ApplicationAtom'
+import {useRecoilValue, useRecoilState} from 'recoil'
+import {schedulersState} from './atoms/SchedulerAtom'
 
 const Schedule = () => {
+  const applicationConfig = useRecoilValue(applicationConfigState)
+  const [schedulers, setSchedulers] = useRecoilState(schedulersState)
+  let checkedSchedulerIDs = []
+
+  useEffect(() => {
+    initScheduler()
+  }, [])
+
+  const initScheduler = async () => {
+    getSchedulers()
+  }
+
+  const getSchedulers = async () => {
+    axios
+      .get(applicationConfig?.service?.url + '/schedulers', {
+        params: {
+          limit: '300' // 쿼리 매개변수를 params 객체로 전달
+        }
+      })
+      .then((Response) => {
+        console.log(Response.data.list)
+        setSchedulers(Response.data.list)
+      })
+      .catch((Error) => {
+        // setServerStatus(false)
+        // setLoading(false)
+        // setShowAuditMessage(true)
+        // setAuditStatus('error')
+        // setAuditMessage('서버의 상태를 확인해주세요.')
+        console.log(Error)
+      })
+  }
+
   const columns = [
-    {field: 'id', headerName: 'ID', width: 90},
+    {field: 'id', headerName: 'ID', width: 60},
     {
-      field: 'firstName',
-      headerName: 'First name',
-      width: 150,
-      editable: true
+      field: 'status',
+      headerName: '상태',
+      width: 100,
+      editable: false
     },
     {
-      field: 'lastName',
-      headerName: 'Last name',
-      width: 150,
-      editable: true
+      field: 'name',
+      headerName: '이름',
+      width: 200,
+      editable: false
     },
     {
-      field: 'age',
-      headerName: 'Age',
-      type: 'number',
-      width: 110,
-      editable: true
+      field: 'description',
+      headerName: '설명',
+      width: 300,
+      editable: false
     },
     {
-      field: 'fullName',
-      headerName: 'Full name',
+      field: 'cron_expression',
+      headerName: '주기',
+      width: 120,
+      editable: false
+    },
+    {
+      field: 'created_at',
+      headerName: 'Created Time',
       description: 'This column has a value getter and is not sortable.',
-      sortable: false,
-      width: 160,
-      valueGetter: (value, row) =>
-        `${row.firstName || ''} ${row.lastName || ''}`
+      width: 200,
+      editable: false
     }
   ]
 
-  const rows = [
-    {id: 1, lastName: 'Snow', firstName: 'Jon', age: 14},
-    {id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31},
-    {id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31},
-    {id: 4, lastName: 'Stark', firstName: 'Arya', age: 11},
-    {id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null},
-    {id: 6, lastName: 'Melisandre', firstName: null, age: 150},
-    {id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44},
-    {id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36},
-    {id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65}
-  ]
-
+  const handleRowSelection = (rowSelectionModel, details) => {
+    checkedSchedulerIDs = rowSelectionModel
+  }
   const handleCreate = () => {}
   const handleDelete = () => {}
-  const handleStart = () => {}
-  const handleStop = () => {}
+  const handleStart = () => {
+    checkedSchedulerIDs.forEach((id) => {
+      axios
+        .patch(applicationConfig?.service?.url + '/schedulers/start/' + id)
+        .then((Response) => {
+          console.log(Response)
+          initScheduler()
+        })
+        .catch((Error) => {
+          console.log(Error)
+        })
+    })
+  }
+  const handleStop = () => {
+    checkedSchedulerIDs.forEach((id) => {
+      axios
+        .patch(applicationConfig?.service?.url + '/schedulers/stop/' + id)
+        .then((Response) => {
+          console.log(Response)
+          initScheduler()
+        })
+        .catch((Error) => {
+          console.log(Error)
+        })
+    })
+  }
 
   return (
     <div
@@ -64,7 +119,15 @@ const Schedule = () => {
         height: '100vh'
       }}
     >
-      <div style={{display: 'flex', flex: '0 0 38px', flexFlow: 'row nowrap'}}>
+      <div
+        style={{
+          display: 'flex',
+          flex: '0 0 38px',
+          flexFlow: 'row nowrap',
+          width: '100%',
+          justifyContent: 'end'
+        }}
+      >
         <LoadingButton
           size='small'
           color='secondary'
@@ -98,9 +161,9 @@ const Schedule = () => {
           <span>중지</span>
         </LoadingButton>
       </div>
-      <div style={{display: 'flex', flex: '0 0 auto'}}>
+      <div style={{display: 'flex', flex: '1 0 auto', width: '100%'}}>
         <DataGrid
-          rows={rows}
+          rows={schedulers}
           columns={columns}
           initialState={{
             pagination: {
@@ -111,7 +174,8 @@ const Schedule = () => {
           }}
           pageSizeOptions={[5]}
           checkboxSelection
-          disableRowSelectionOnClick
+          // disableRowSelectionOnClick
+          onRowSelectionModelChange={handleRowSelection}
         />
       </div>
     </div>
