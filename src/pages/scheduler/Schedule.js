@@ -6,10 +6,14 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import {applicationConfigState} from '../../config/atoms/ApplicationAtom'
 import {useRecoilValue, useRecoilState} from 'recoil'
 import {schedulersState} from './atoms/SchedulerAtom'
+import { openPopupState, schedulerInfoState } from './atoms/SchedulerPopupAtom'
+import { SchedulerPopup } from './components/SchedulerPopup'
 
 const Schedule = () => {
   const applicationConfig = useRecoilValue(applicationConfigState)
   const [schedulers, setSchedulers] = useRecoilState(schedulersState)
+  const [openPopup, setOpenPopup] = useRecoilState(openPopupState)
+  const [schdulerInfo, setSchedulerInfo] = useRecoilState(schedulerInfoState)
   let checkedSchedulerIDs = []
 
   useEffect(() => {
@@ -79,7 +83,9 @@ const Schedule = () => {
   const handleRowSelection = (rowSelectionModel, details) => {
     checkedSchedulerIDs = rowSelectionModel
   }
-  const handleCreate = () => {}
+  const handleCreate = () => {
+    setOpenPopup(true)
+  }
   const handleDelete = () => {}
   const handleStart = () => {
     checkedSchedulerIDs.forEach((id) => {
@@ -178,6 +184,7 @@ const Schedule = () => {
           onRowSelectionModelChange={handleRowSelection}
         />
       </div>
+      <SchedulerPopup />
     </div>
   )
 }
