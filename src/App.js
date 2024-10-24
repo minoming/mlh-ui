@@ -45,7 +45,7 @@ function App() {
   return (
     <Routes>
       <Route path='/' element={<Home />} />
-      <Route path='/scheduler' element={<Schedule />} />
+      <Route path='/schedulers' element={<Schedule />} />
     </Routes>
   )
 }
