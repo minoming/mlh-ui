@@ -10,6 +10,7 @@ export const schedulerInfoState = atom({
   default: {
     schedulerName: "",
     schedulerDescription: "",
+    url: "",
     cronExpression: "0 0 * * *"
   }
 })

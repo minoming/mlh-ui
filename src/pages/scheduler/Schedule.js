@@ -1,28 +1,33 @@
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react'
 import axios from 'axios'
-import {DataGrid} from '@mui/x-data-grid'
-import {Box} from '@mui/material'
+import { DataGrid } from '@mui/x-data-grid'
+import { Box } from '@mui/material'
+import { CircularProgress } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton'
-import {applicationConfigState} from '../../config/atoms/ApplicationAtom'
-import {useRecoilValue, useRecoilState} from 'recoil'
-import {schedulersState} from './atoms/SchedulerAtom'
-import {openPopupState, schedulerInfoState} from './atoms/SchedulerPopupAtom'
-import {SchedulerPopup} from './components/SchedulerPopup'
+import { applicationConfigState } from '../../config/atoms/ApplicationAtom'
+import { useRecoilValue, useRecoilState } from 'recoil'
+import { isLoadingState, schedulersState } from './atoms/SchedulerAtom'
+import { openPopupState, schedulerInfoState } from './atoms/SchedulerPopupAtom'
+import { SchedulerPopup } from './components/SchedulerPopup'
 import useSchedulerService from './services/schedulerService'
 
 const Schedule = () => {
   const applicationConfig = useRecoilValue(applicationConfigState)
+  const isLoading = useRecoilValue(isLoadingState)
   const [schedulers, setSchedulers] = useRecoilState(schedulersState)
   const [openPopup, setOpenPopup] = useRecoilState(openPopupState)
   const [schdulerInfo, setSchedulerInfo] = useRecoilState(schedulerInfoState)
-  const {getSchedulers, patchScheduler} = useSchedulerService()
+  const { getSchedulers, patchScheduler } = useSchedulerService()
+
   let checkedSchedulerIDs = []
 
   useEffect(() => {
     initScheduler()
   }, [])
 
-  const initScheduler = async () => {}
+  const initScheduler = async () => {
+    handleSearch()
+  }
 
   const columns = [
     // {field: 'id', headerName: 'ID', width: 60},
@@ -75,10 +80,16 @@ const Schedule = () => {
   }
 
   const handleCreate = () => {
+    setSchedulerInfo({
+      schedulerName: "",
+      schedulerDescription: "",
+      url: "",
+      cronExpression: "0 0 * * *"
+    })
     setOpenPopup(true)
   }
 
-  const handleDelete = () => {}
+  const handleDelete = () => { }
 
   const handleSetStatus = async (event) => {
     const data = {
@@ -96,7 +107,7 @@ const Schedule = () => {
             (res) => res.data.content.id === scheduler.id
           )
           return updatedScheduler
-            ? {...scheduler, ...updatedScheduler.data.content}
+            ? { ...scheduler, ...updatedScheduler.data.content }
             : scheduler
         })
       )
@@ -104,6 +115,22 @@ const Schedule = () => {
       console.error('Error updating some schedulers:', error)
     }
   }
+
+  const handleClose = (isSearch) => {
+    setOpenPopup(false)
+
+    if(isSearch) {
+      handleSearch()
+    }
+  }
+
+
+  const centerStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+  };
 
   return (
     <div
@@ -168,7 +195,7 @@ const Schedule = () => {
           <span>중지</span>
         </LoadingButton>
       </div>
-      <div style={{display: 'flex', flex: '1 0 auto', width: '100%'}}>
+      <div style={{ display: 'flex', flex: '1 0 auto', width: '100%' }}>
         <DataGrid
           rows={schedulers}
           columns={columns}
@@ -185,7 +212,10 @@ const Schedule = () => {
           onRowSelectionModelChange={handleRowSelection}
         />
       </div>
-      <SchedulerPopup />
+      <SchedulerPopup open={openPopup} onClose={handleClose}/>
+      <div style={centerStyle}>
+        {isLoading && <CircularProgress color="success"/>}
+      </div>
     </div>
   )
 }

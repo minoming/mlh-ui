@@ -1,4 +1,4 @@
-import {useRecoilState} from 'recoil'
+import { useRecoilState } from 'recoil'
 import {
   openPopupState,
   schedulerInfoState,
@@ -18,27 +18,22 @@ import {
 } from '@mui/material'
 import useSchedulerService from '../services/schedulerService'
 
-export const SchedulerPopup = () => {
-  const [openPopup, setOpenPopup] = useRecoilState(openPopupState)
+export const SchedulerPopup = ({ open, onClose }) => {
   const [schedulerInfo, setSchedulerInfo] = useRecoilState(schedulerInfoState)
   const [requiredValueError, setRequiredValueError] = useRecoilState(
     requiredValueErrorState
   )
-  const {postScheduler} = useSchedulerService()
-
-  const handleClose = () => {
-    setOpenPopup(false)
-  }
+  const { postScheduler } = useSchedulerService()
 
   const handleSave = async () => {
     try {
       const newScheduler = await postScheduler(schedulerInfo)
-      console.log(newScheduler)
-    } catch (error) {}
+      onClose(true)
+    } catch (error) { }
   }
 
   const handleChange = (event) => {
-    const {name, value} = event.target
+    const { name, value } = event.target
     setSchedulerInfo((prev) => ({
       ...prev,
       [name]: value
@@ -47,9 +42,9 @@ export const SchedulerPopup = () => {
 
   return (
     <div>
-      <Dialog open={openPopup} onClose={handleClose}>
+      <Dialog open={open} onClose={onClose}>
         <DialogTitle>스케줄러 생성</DialogTitle>
-        <DialogContent style={{width: '500px', height: '300px'}}>
+        <DialogContent style={{ width: '500px', height: '300px' }}>
           <TextField
             autoFocus
             margin='dense'
@@ -73,6 +68,17 @@ export const SchedulerPopup = () => {
             fullWidth
             variant='outlined'
             value={schedulerInfo?.schedulerDescription}
+            onChange={handleChange}
+          />
+          <TextField
+            autoFocus
+            margin='dense'
+            label='URL'
+            name='url'
+            type='text'
+            fullWidth
+            variant='outlined'
+            value={schedulerInfo?.url}
             onChange={handleChange}
           />
           <FormControl fullWidth variant='outlined' margin='dense'>
@@ -101,7 +107,7 @@ export const SchedulerPopup = () => {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color='primary'>
+          <Button onClick={() => onClose(false)} color='primary'>
             취소
           </Button>
           <Button onClick={handleSave} color='primary'>
