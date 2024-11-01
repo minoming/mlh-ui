@@ -1,8 +1,8 @@
 import axios from 'axios'
 import {applicationConfigState} from '../../../config/atoms/ApplicationAtom'
-import { isLoadingState } from '../atoms/SchedulerAtom';
 import {useRecoilValue, useSetRecoilState} from 'recoil'
 import { openPopupState } from '../atoms/SchedulerPopupAtom';
+import { isLoadingState } from '../../../automs/AppAtom';
 
 
 const useSchedulerService = () => {

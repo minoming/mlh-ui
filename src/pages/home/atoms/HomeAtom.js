@@ -18,8 +18,8 @@ export const modeState = atom({
   default: 'desktop'
 })
 
-export const urlState = atom({
-  key: 'urlState',
+export const urlState2 = atom({
+  key: 'urlState2',
   default: 'https://airhorner.com'
 })
 

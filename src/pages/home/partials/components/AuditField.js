@@ -4,7 +4,7 @@ import {useRecoilState} from 'recoil'
 import axios from 'axios'
 import {
   serverStatusState,
-  urlState,
+  urlState2,
   auditModeState,
   loadingState,
   showAuditMessageState,
@@ -16,7 +16,7 @@ import {
 const AuditField = (event) => {
   const [serverStatus, setServerStatus] = useRecoilState(serverStatusState)
 
-  const [url, setUrl] = useRecoilState(urlState)
+  const [url, setUrl] = useRecoilState(urlState2)
   const [loading, setLoading] = useRecoilState(loadingState)
   const [showAuditMessage, setShowAuditMessage] = useRecoilState(
     showAuditMessageState

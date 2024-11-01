@@ -6,10 +6,11 @@ import { CircularProgress } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton'
 import { applicationConfigState } from '../../config/atoms/ApplicationAtom'
 import { useRecoilValue, useRecoilState } from 'recoil'
-import { isLoadingState, schedulersState } from './atoms/SchedulerAtom'
+import { schedulersState } from './atoms/SchedulerAtom'
 import { openPopupState, schedulerInfoState } from './atoms/SchedulerPopupAtom'
 import { SchedulerPopup } from './components/SchedulerPopup'
 import useSchedulerService from './services/schedulerService'
+import { isLoadingState } from '../../automs/AppAtom';
 
 const Schedule = () => {
   const applicationConfig = useRecoilValue(applicationConfigState)
@@ -66,6 +67,10 @@ const Schedule = () => {
 
   const handleRowSelection = (rowSelectionModel, details) => {
     checkedSchedulerIDs = rowSelectionModel
+  }
+
+  const handleRowDblClick = (rowDblModel) => {
+    console.log(rowDblModel)
   }
 
   const handleSearch = async () => {
@@ -130,7 +135,7 @@ const Schedule = () => {
     justifyContent: 'center',
     alignItems: 'center',
     height: '100vh',
-  };
+  }
 
   return (
     <div
@@ -202,14 +207,15 @@ const Schedule = () => {
           initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 5
+                pageSize: 20
               }
             }
           }}
-          pageSizeOptions={[5]}
-          checkboxSelection
-          // disableRowSelectionOnClick
-          onRowSelectionModelChange={handleRowSelection}
+          pageSizeOptions={[20]}
+          // checkboxSelection
+          disableSelectionOnClick
+          onSelectionModelChange={handleRowSelection}
+          onCellDoubleClick={handleRowDblClick}
         />
       </div>
       <SchedulerPopup open={openPopup} onClose={handleClose}/>
