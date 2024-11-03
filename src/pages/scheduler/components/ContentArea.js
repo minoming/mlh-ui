@@ -1,39 +1,96 @@
-import { LoadingButton } from '@mui/lab';
-import { Box, Button, Paper } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid';
-import React from 'react'
-import { schedulerLogsState } from '../automs/SchedulerLogAtom';
-import { useRecoilValue } from 'recoil';
+import React, {useState} from 'react'
+import {useRecoilValue, useSetRecoilState} from 'recoil'
+import {Box, Button, Paper} from '@mui/material'
+import {DataGrid} from '@mui/x-data-grid'
+import {
+  openPopupCreateSchedulerState,
+  schedulersState,
+  schedulerInfoState
+} from '../atoms/SchedulerAtom'
+import {LoadingButton} from '@mui/lab'
+import useSchedulerService from '../services/schedulerService'
 
-const ContentArea = () => {
-  const rows = useRecoilValue(schedulerLogsState)
+const ContentArea = (props) => {
+  const handleSearch = props.onSearch
+  const {patchScheduler, deleteScheduler} = useSchedulerService()
+  const setOpenPopupCreateScheduler = useSetRecoilState(
+    openPopupCreateSchedulerState
+  )
+  const setSchedulerInfo = useSetRecoilState(schedulerInfoState)
+  const rows = useRecoilValue(schedulersState)
   const columns = [
     // {field: 'id', headerName: 'ID', width: 60},
     {
       field: 'status',
       headerName: 'Status',
-      width: 100,
+      flex: 1,
       editable: false
     },
     {
-      field: 'schedulerName',
+      field: 'name',
       headerName: 'Scheduler Name',
-      width: 300,
+      flex: 1,
       editable: false
     },
     {
-      field: 'message',
-      headerName: 'Message',
-      width: 600,
+      field: 'description',
+      headerName: 'Description',
+      flex: 1,
       editable: false
     },
     {
-      field: 'createdAt',
-      headerName: 'Created Time',
-      width: 300,
+      field: 'url',
+      headerName: 'URL',
+      flex: 1,
+      editable: false
+    },
+    {
+      field: 'cronExpression',
+      headerName: 'Cron Expression',
+      flex: 1,
+      editable: false
+    },
+    {
+      field: 'lastExecutionTime',
+      headerName: 'Last Execution Time',
+      flex: 1,
       editable: false
     }
   ]
+  const [selectionRow, setSelectionRow] = useState([])
+  const handleSelectionChange = (newSelection) => {
+    setSelectionRow(newSelection)
+  }
+
+  const handleCreate = () => {
+    setSchedulerInfo({
+      schedulerName: '',
+      schedulerDescription: '',
+      url: 'https://airhorner.com',
+      cronExpression: '0 0 * * *'
+    })
+    setOpenPopupCreateScheduler(true)
+  }
+  const handleUpdate = () => {}
+  const handleDelete = async () => {
+    const response = await deleteScheduler(selectionRow?.id)
+    handleSearch(true)
+  }
+
+  const handleSetStatus = async (event) => {
+    const buttonName = event.currentTarget.name
+
+    if (!selectionRow || !buttonName) {
+      return
+    }
+
+    const data = {
+      status: event.currentTarget.name
+    }
+
+    const response = await patchScheduler(selectionRow.id, data)
+    handleSearch(true)
+  }
 
   return (
     <Box
@@ -44,8 +101,9 @@ const ContentArea = () => {
         flexDirection: 'column',
         p: 1,
         pt: 0,
-        height: '65vh',
-        bgcolor: '#f5f5f5',
+        height: '77vh',
+        width: '100%',
+        bgcolor: '#f5f5f5'
       }}
     >
       <Paper
@@ -61,55 +119,84 @@ const ContentArea = () => {
           gap: 1
         }}
       >
-        <Box sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          gap: 1,
-          justifyContent: 'end'
-        }}>
-          <Button
-            size='small'
-            variant="outlined"
-            color="primary"
-            style={{ borderRadius: '5px' }}
-            onClick={() => { }}
-          >
-            New
-          </Button>
-          <Button
-            size='small'
-            variant="outlined"
-            style={{ borderRadius: '5px', color: '#FFA500', borderColor: '#FFA500'}}
-            onClick={() => { }}
-          >
-            Modify
-          </Button>
-          <LoadingButton
-            loading
-            loadingPosition='start'
-            size='small'
-            variant="outlined"
-            color="secondary"
-            style={{ borderRadius: '5px' }}
-            onClick={() => { }}
-          >
-            Delete
-          </LoadingButton>
-        </Box>
-
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10
-              }
-            }
+        <Box
+          sx={{
+            display: 'flex',
+            flexFlow: 'column nowrap',
+            flex: '1 0 auto',
+            width: '100%',
+            gap: 1
           }}
-          pageSizeOptions={[10]}
-          checkboxSelection
-        />
+        >
+          <Box sx={{display: 'flex'}}>
+            <Box sx={{display: 'flex', gap: 0.5}}>
+              <LoadingButton
+                name='running'
+                size='small'
+                variant='outlined'
+                color='success'
+                onClick={handleSetStatus}
+              >
+                <span>Start</span>
+              </LoadingButton>
+              <LoadingButton
+                name='stopped'
+                size='small'
+                variant='outlined'
+                color='error'
+                onClick={handleSetStatus}
+              >
+                <span>Stop</span>
+              </LoadingButton>
+            </Box>
+            <Box sx={{display: 'flex', flex: 1}}></Box>
+            <Box sx={{display: 'flex', gap: 0.5}}>
+              <Button
+                size='small'
+                color='primary'
+                onClick={handleCreate}
+                variant='outlined'
+              >
+                <span>Create</span>
+              </Button>
+              <Button
+                size='small'
+                color='success'
+                onClick={handleUpdate}
+                variant='outlined'
+              >
+                <span>Update</span>
+              </Button>
+              <LoadingButton
+                size='small'
+                color='warning'
+                onClick={handleDelete}
+                variant='outlined'
+              >
+                <span>Delete</span>
+              </LoadingButton>
+            </Box>
+          </Box>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            // checkboxSelection
+            onRowClick={handleSelectionChange}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 100
+                }
+              }
+            }}
+            pageSizeOptions={[100]}
+            sx={{
+              width: '100%',
+              flex: 1,
+              overflow: 'auto'
+            }}
+          />
+        </Box>
       </Paper>
     </Box>
   )

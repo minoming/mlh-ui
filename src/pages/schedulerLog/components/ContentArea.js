@@ -1,9 +1,8 @@
-import { LoadingButton } from '@mui/lab';
-import { Box, Button, Paper } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid';
+import {Box, Paper} from '@mui/material'
+import {DataGrid} from '@mui/x-data-grid'
 import React from 'react'
-import { schedulerLogsState } from '../automs/SchedulerLogAtom';
-import { useRecoilValue } from 'recoil';
+import {schedulerLogsState} from '../automs/SchedulerLogAtom'
+import {useRecoilValue} from 'recoil'
 
 const ContentArea = () => {
   const rows = useRecoilValue(schedulerLogsState)
@@ -12,25 +11,25 @@ const ContentArea = () => {
     {
       field: 'status',
       headerName: 'Status',
-      width: 150,
+      flex: 1,
       editable: false
     },
     {
       field: 'schedulerName',
       headerName: 'Scheduler Name',
-      width: 300,
+      flex: 2,
       editable: false
     },
     {
       field: 'message',
       headerName: 'Message',
-      width: 600,
+      flex: 4,
       editable: false
     },
     {
       field: 'createdAt',
       headerName: 'Created Time',
-      width: 300,
+      flex: 1,
       editable: false
     }
   ]
@@ -44,8 +43,9 @@ const ContentArea = () => {
         flexDirection: 'column',
         p: 1,
         pt: 0,
-        height: '65vh',
-        bgcolor: '#f5f5f5',
+        height: '70vh',
+        width: '100%',
+        bgcolor: '#f5f5f5'
       }}
     >
       <Paper
@@ -61,19 +61,26 @@ const ContentArea = () => {
           gap: 1
         }}
       >
-
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 100
+        <Box sx={{display: 'flex', flex: '1 0 auto', width: '100%'}}>
+          {' '}
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 100
+                }
               }
-            }
-          }}
-          pageSizeOptions={[100]}
-        />
+            }}
+            pageSizeOptions={[100]}
+            sx={{
+              width: '100%',
+              flex: 1,
+              overflow: 'auto'
+            }}
+          />
+        </Box>
       </Paper>
     </Box>
   )

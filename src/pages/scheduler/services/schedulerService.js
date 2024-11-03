@@ -1,22 +1,21 @@
 import axios from 'axios'
 import {applicationConfigState} from '../../../config/atoms/ApplicationAtom'
 import {useRecoilValue, useSetRecoilState} from 'recoil'
-import { openPopupState } from '../atoms/SchedulerPopupAtom';
-import { isLoadingState } from '../../../automs/AppAtom';
-
+import {isLoadingState} from '../../../automs/AppAtom'
 
 const useSchedulerService = () => {
   const applicationConfig = useRecoilValue(applicationConfigState)
   const setLoading = useSetRecoilState(isLoadingState)
-  
-  
-  const getSchedulers = async (data) => {
-    data = data ? data : {}
+
+  const getSchedulers = async (params) => {
+    params = params ? params : {}
     try {
       setLoading(true)
       const response = await axios.get(
         applicationConfig?.service?.url + '/schedulers',
-        data
+        {
+          params: params
+        }
       )
       return response.data
     } catch (error) {
@@ -89,9 +88,16 @@ const useSchedulerService = () => {
 
   const deleteScheduler = async (schedulerId) => {
     try {
+      setLoading(true)
+      const response = await axios.delete(
+        applicationConfig?.service?.url + '/schedulers/' + schedulerId
+      )
+      return response
     } catch (error) {
       console.error('Error deleting scheduler:', error)
       throw error
+    } finally {
+      setLoading(false)
     }
   }
 

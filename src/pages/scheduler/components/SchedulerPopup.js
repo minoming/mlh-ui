@@ -1,9 +1,4 @@
-import { useRecoilState } from 'recoil'
-import {
-  openPopupState,
-  schedulerInfoState,
-  requiredValueErrorState
-} from '../atoms/SchedulerPopupAtom'
+import {useRecoilState} from 'recoil'
 import {
   Dialog,
   DialogTitle,
@@ -17,23 +12,27 @@ import {
   FormControl
 } from '@mui/material'
 import useSchedulerService from '../services/schedulerService'
+import {
+  requiredValueErrorState,
+  schedulerInfoState
+} from '../atoms/SchedulerAtom'
 
-export const SchedulerPopup = ({ open, onClose }) => {
+export const SchedulerPopup = ({open, onClose}) => {
   const [schedulerInfo, setSchedulerInfo] = useRecoilState(schedulerInfoState)
   const [requiredValueError, setRequiredValueError] = useRecoilState(
     requiredValueErrorState
   )
-  const { postScheduler } = useSchedulerService()
+  const {postScheduler} = useSchedulerService()
 
   const handleSave = async () => {
     try {
       const newScheduler = await postScheduler(schedulerInfo)
       onClose(true)
-    } catch (error) { }
+    } catch (error) {}
   }
 
   const handleChange = (event) => {
-    const { name, value } = event.target
+    const {name, value} = event.target
     setSchedulerInfo((prev) => ({
       ...prev,
       [name]: value
@@ -43,12 +42,12 @@ export const SchedulerPopup = ({ open, onClose }) => {
   return (
     <div>
       <Dialog open={open} onClose={onClose}>
-        <DialogTitle>스케줄러 생성</DialogTitle>
-        <DialogContent style={{ width: '500px', height: '300px' }}>
+        <DialogTitle>Create Scheduler</DialogTitle>
+        <DialogContent style={{width: '500px', height: '300px'}}>
           <TextField
             autoFocus
             margin='dense'
-            label='스케줄러 이름'
+            label='Scheduler Name'
             name='schedulerName'
             type='text'
             fullWidth
@@ -62,7 +61,7 @@ export const SchedulerPopup = ({ open, onClose }) => {
           <TextField
             autoFocus
             margin='dense'
-            label='스케줄러 설명'
+            label='Scheduler Description'
             name='schedulerDescription'
             type='text'
             fullWidth
@@ -78,12 +77,13 @@ export const SchedulerPopup = ({ open, onClose }) => {
             type='text'
             fullWidth
             variant='outlined'
+            required
             value={schedulerInfo?.url}
             onChange={handleChange}
           />
           <FormControl fullWidth variant='outlined' margin='dense'>
             <InputLabel required id='cron-expression-select-label'>
-              스케줄러 주기(Cron Expression)
+              Frequency(Cron Expression)
             </InputLabel>
             <Select
               labelId='cron-expression-select-label'
@@ -93,7 +93,6 @@ export const SchedulerPopup = ({ open, onClose }) => {
               value={schedulerInfo.cronExpression}
               onChange={handleChange}
             >
-              <MenuItem value=''></MenuItem>
               <MenuItem value={'* * * * *'}>매분</MenuItem>
               <MenuItem value={'0 0 * * *'}>매일 00시</MenuItem>
               <MenuItem value={'0 0 * * 1'}>월요일 00시</MenuItem>
@@ -107,11 +106,11 @@ export const SchedulerPopup = ({ open, onClose }) => {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => onClose(false)} color='primary'>
-            취소
+          <Button inert onClick={() => onClose(false)} color='black'>
+            Cancel
           </Button>
-          <Button onClick={handleSave} color='primary'>
-            생성
+          <Button inert onClick={handleSave} color='primary'>
+            Save
           </Button>
         </DialogActions>
       </Dialog>
