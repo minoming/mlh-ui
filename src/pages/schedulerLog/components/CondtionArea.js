@@ -85,9 +85,7 @@ const ConditionArea = () => {
 
     const res = await getSchedulerLogs(data)
 
-    if (res?.count > 0) {
-      setSchedulerLogs(res.list)
-    }
+    setSchedulerLogs(res.list)
   }
 
   /**

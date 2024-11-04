@@ -43,7 +43,8 @@ const ConditionArea = forwardRef((props, ref) => {
     const data = {
       name: schedulerName,
       description: description,
-      status: status
+      status: status,
+      url: ''
     }
     const response = await getSchedulers(data)
     setSchedulers(response.list)

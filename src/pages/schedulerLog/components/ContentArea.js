@@ -11,13 +11,23 @@ const ContentArea = () => {
     {
       field: 'status',
       headerName: 'Status',
-      flex: 1,
-      editable: false
+      flex: 0.6,
+      editable: false,
+      renderCell: (params) => {
+        let color = '#111111'
+        if(params.value === 'running') { color = '#4caf50' }
+        if(params.value === 'stopped') { color = '#f44336' }
+        if(params.value === 'executed') { color = '#1976d2' }
+        if(params.value === 'failed') { color = '#ff9800' }
+        return (
+          <div style={{ color: color }}>{params.value}</div>
+        )
+      }
     },
     {
       field: 'schedulerName',
       headerName: 'Scheduler Name',
-      flex: 2,
+      flex: 1.2,
       editable: false
     },
     {
@@ -61,8 +71,6 @@ const ContentArea = () => {
           gap: 1
         }}
       >
-        <Box sx={{display: 'flex', flex: '1 0 auto', width: '100%'}}>
-          {' '}
           <DataGrid
             rows={rows}
             columns={columns}
@@ -77,10 +85,9 @@ const ContentArea = () => {
             sx={{
               width: '100%',
               flex: 1,
-              overflow: 'auto'
+              height: '100%'
             }}
           />
-        </Box>
       </Paper>
     </Box>
   )

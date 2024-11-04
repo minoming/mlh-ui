@@ -22,8 +22,8 @@ const mainListItems = [
 ];
 
 const secondaryListItems = [
-  { text: 'Settings', icon: <SettingsRoundedIcon /> },
-  { text: 'About', icon: <InfoRoundedIcon /> },
+  { text: 'Settings', icon: <SettingsRoundedIcon />, path: '/settings' },
+  { text: 'About', icon: <InfoRoundedIcon />, path: '/about' },
 ];
 
 export default function MenuContent() {
@@ -44,7 +44,7 @@ export default function MenuContent() {
       <List dense>
         {secondaryListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton>
+            <ListItemButton onClick={() => alert('준비중 입니다 :)')}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>

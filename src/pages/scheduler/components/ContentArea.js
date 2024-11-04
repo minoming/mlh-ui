@@ -1,59 +1,66 @@
-import React, {useState} from 'react'
-import {useRecoilValue, useSetRecoilState} from 'recoil'
-import {Box, Button, Paper} from '@mui/material'
-import {DataGrid} from '@mui/x-data-grid'
+import React, { useState } from 'react'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { Box, Button, Paper } from '@mui/material'
+import { DataGrid } from '@mui/x-data-grid'
 import {
   openPopupCreateSchedulerState,
   schedulersState,
   schedulerInfoState
 } from '../atoms/SchedulerAtom'
-import {LoadingButton} from '@mui/lab'
+import { LoadingButton } from '@mui/lab'
 import useSchedulerService from '../services/schedulerService'
 
 const ContentArea = (props) => {
   const handleSearch = props.onSearch
-  const {patchScheduler, deleteScheduler} = useSchedulerService()
+  const { patchScheduler, deleteScheduler } = useSchedulerService()
   const setOpenPopupCreateScheduler = useSetRecoilState(
     openPopupCreateSchedulerState
   )
   const setSchedulerInfo = useSetRecoilState(schedulerInfoState)
   const rows = useRecoilValue(schedulersState)
+
   const columns = [
     // {field: 'id', headerName: 'ID', width: 60},
     {
       field: 'status',
       headerName: 'Status',
       flex: 1,
-      editable: false
+      editable: false,
+      renderCell: (params) => {
+        const color = params.value === 'running' ? '#4caf50' : '#f44336'
+        return (
+          <div style={{ color: color }}>{params.value}</div>
+        )
+      }
     },
     {
       field: 'name',
       headerName: 'Scheduler Name',
-      flex: 1,
+      flex: 2,
       editable: false
     },
     {
       field: 'description',
       headerName: 'Description',
-      flex: 1,
+      flex: 2,
       editable: false
     },
     {
       field: 'url',
       headerName: 'URL',
-      flex: 1,
+      flex: 3,
       editable: false
     },
     {
       field: 'cronExpression',
       headerName: 'Cron Expression',
-      flex: 1,
+      flex: 1.2,
       editable: false
     },
     {
       field: 'lastExecutionTime',
       headerName: 'Last Execution Time',
-      flex: 1,
+      flex: 2,
       editable: false
     }
   ]
@@ -71,7 +78,7 @@ const ContentArea = (props) => {
     })
     setOpenPopupCreateScheduler(true)
   }
-  const handleUpdate = () => {}
+  const handleUpdate = () => { }
   const handleDelete = async () => {
     const response = await deleteScheduler(selectionRow?.id)
     handleSearch(true)
@@ -125,11 +132,12 @@ const ContentArea = (props) => {
             flexFlow: 'column nowrap',
             flex: '1 0 auto',
             width: '100%',
+            height: '100%',
             gap: 1
           }}
         >
-          <Box sx={{display: 'flex'}}>
-            <Box sx={{display: 'flex', gap: 0.5}}>
+          <Box sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex', gap: 0.5 }}>
               <LoadingButton
                 name='running'
                 size='small'
@@ -149,8 +157,8 @@ const ContentArea = (props) => {
                 <span>Stop</span>
               </LoadingButton>
             </Box>
-            <Box sx={{display: 'flex', flex: 1}}></Box>
-            <Box sx={{display: 'flex', gap: 0.5}}>
+            <Box sx={{ display: 'flex', flex: 1 }}></Box>
+            <Box sx={{ display: 'flex', gap: 0.5 }}>
               <Button
                 size='small'
                 color='primary'
@@ -178,24 +186,25 @@ const ContentArea = (props) => {
             </Box>
           </Box>
           <DataGrid
-            rows={rows}
-            columns={columns}
-            // checkboxSelection
-            onRowClick={handleSelectionChange}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 100
+              rows={rows}
+              columns={columns}
+              // checkboxSelection
+              onRowClick={handleSelectionChange}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 100
+                  }
                 }
-              }
-            }}
-            pageSizeOptions={[100]}
-            sx={{
-              width: '100%',
-              flex: 1,
-              overflow: 'auto'
-            }}
-          />
+              }}
+              pageSizeOptions={[100]}
+              sx={{
+                display: 'flex',
+                width: '100%',
+                height: '100%',
+                flex: 1,
+              }}
+            />
         </Box>
       </Paper>
     </Box>
